@@ -112,7 +112,9 @@ tinystoriesgru:
 | Mom said to Tom, "Please do not touch the hot stove." | Mom said to Tom, "Please do not touch the hot stove."<br>The girl was excited to play with the old tree and he was so happy. He was so frightened and he started to cry. His mom laughed and said, "I want to see the coin."<br>The boy hurried off to the living room and saw his friend Tommy for the bear. He was very happy. He ran to the doctor and told his mom that he was not allowed to stay away from the dog.<br>Tom and Lily were sorry and asked, "What is this? That way, you can try and get a chest for you."<br>They started to make noises and see a big box. They | (500 tokens, 119.24 it/s) |
 | Once upon a time | Once upon a time there was a baby who lived in a big castle. The bunny was very proud of him and they knew they were going to visit him.<br>As the cow was running and laughing, they said goodbye to the swan. They looked and looked at the man. They learned that it is always difficult to keep it into a patch of light they can be friends and clean up the meadow. | (343 tokens, 151.51 it/s) |
 
-As it can be seen, the official model (transformer based) is still better with long term context, but is 2x slower on CPU.
+As it can be seen, the official model (transformer based) is still better with long term context, and faster for large context generation. Note here tokens for transofrmer would also be multiplied with the length per character.
+
+Though the GRU is much faster in shorter bursts (short form generation, as self attention is less of an overhead)
 
 The tinystoriesgru model can be directly ran on any machine with python and pytorch by cloning the repository and running ```chat.py```.
 
