@@ -5,8 +5,6 @@ The datasheet used here is Tinystories-valid.txt(20MB) downloaded from HuggingFa
 
 ## Core:
 
-The primary reason to train on GRU is the speed efficiency over transformers at very small scale models. Tinystories allowed coherent text generation on models as small as 50MB with tinystories-1M. But is it really possible to achieve more efficiency while retaining the grammar, and long term memory of a full transformer based model?
-
 GRU uses self-gating through sigmoid.
 
 Instead of standard attention, where
@@ -52,7 +50,7 @@ During backpropagation (training), the gradient needs to flow from the end of th
 In a standard RNN (h = tanh(W*h)), the gradient gets multiplied by $W$ at every step. If $W < 1$, the gradient vanishes (goes to zero).
 All of it is, obviously, stored as a cache in the hard drive.
 
-After this optimisation, upon training a 1.5M parameter model, roughly the size of ~6MG over 1000 steps(batch size = 256), the immediate improvements were the grammar context framing. The model was still bad at retrieving almost any long form context at all.
+After this optimisation, upon training a 1.5M parameter model, roughly the size of ~6MB over 1000 steps(batch size = 256), the immediate improvements were the grammar context framing. The model was still bad at retrieving almost any long form context at all.
 
 The final optimisation to add was to invite self attention to help for the same.
 
@@ -80,7 +78,7 @@ The score for any future word is set to -infinity for preventing the model to lo
 ## Tokeniser:
 
 This model uses a character-level tokeniser instead of using a BPE (Byte Pair Encoding) tokeniser used in GPT-style transformers. The vocab is just all the characters used in the original training datasheet, which allows it to live in the chat.py file itself.
-This has allowed for serious efficiency in terms of raw model size, since a 10.5MB model would be ~10MB of pure logic.
+This has allowed for serious efficiency in terms of raw model size, since a 10.05MB model would be ~10MB of pure logic.
 
 ## Final model and performance (vs. Tinystories-1M):
 
