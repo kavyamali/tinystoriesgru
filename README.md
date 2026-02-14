@@ -1,5 +1,5 @@
 # tinystoriesgru
-A 2.5M parameter TinyStories model trained on GRU with attention, 5x smaller than TinyStories-1M.
+A 0.2M and 2.5M parameter TinyStories model trained on GRU with attention, much smaller than TinyStories-1M.
 
 The datasheet used here is Tinystories-valid.txt(20MB) downloaded from HuggingFace.
 
@@ -68,7 +68,9 @@ This makes the GRU computationally much heavier, since:
 
 * Attention: O(T² · d)
 * GRUCell: O(d²)
-* Total attention cost ≈ Σₜ T² = O(T³) 
+* Total attention cost ≈ Σₜ T² = O(T³)
+
+> This is for full self attention. If more efficient, search query based attention is used, the cost redcuces to O(T²d²). This is demonstrated in tinystoriesgru-0.2M(see ```train.py```).
 
 But because of the already great efficiency of GRU, the performance is still good and only degrades over very large context generations. (>1000 tokens and so).
 
@@ -80,13 +82,39 @@ The score for any future word is set to -infinity for preventing the model to lo
 This model uses a character-level tokeniser instead of using a BPE (Byte Pair Encoding) tokeniser used in GPT-style transformers. The vocab is just all the characters used in the original training datasheet, which allows it to live in the chat.py file itself.
 This has allowed for serious efficiency in terms of raw model size, since a 10.05MB model would be ~10MB of pure logic.
 
+## Release: tinystoriesgru-0.2M
+
+The 0.2M model is trained with a batch size of 128 and n_embd=96DIMs.The raw FP32 weights are weighed at 1,051KB or ~1MB. 
+
+The model is further quantised to INT8 precision, which is weighed at 271KB.
+
+The 0.2M release introduces the Anchor states in the chat file, which is an attempt to force a fake memory for character names in the datasheet over a span of generation.
+
+This works by introducing a $W_{hh}$ multiplier to the input h(t-1). The eigenvalues are used as a knob to 'fake' the anchor signal.
+
+Using standard tools, the measured spectral radius (highest magnitude of eigenvalue) and Orthogonality were compared.
+
+| Metric                    | FP32 (1MB)      | INT8 (271KB)
+| :--- | :--- | :--- |
+| Spectral Radius (ρ)       | 1.8842          | 0.5855
+| Mean Cosine Similarity    | -0.1900          | -0.1904
+
 ## Final model and performance (vs. Tinystories-1M):
 
-The model was trained on an NVIDIA T4 using Google Colab free, in 2 hours and 10 minutes with a batch size of 64 and 4800 steps in total.
+The model was trained on an NVIDIA T4 using Google Colab free, in 2 hours and 10 minutes with a batch size of 64 and 4800 steps in total for the 2.5M model and 1 hour with a bath size of 128 and 10000 steps in total for the 0.2M model.
 
 Since I don't have the hardware to train this model for any longer, I've included the ```train.py``` for anyone to try.
 
+## Graphs:
+
+1) tinystoriesgru
+
   ![alt text](https://github.com/kavyamali/tinystoriesgru/blob/main/Graph.png)
+
+2) tinystoriesgru-0.2M
+  
+  ![alt text](https://github.com/kavyamali/tinystoriesgru/blob/main/Graph-0.2M.png)
+  
 
 # Comparision with TinyStories-1M
 
@@ -110,11 +138,27 @@ tinystoriesgru:
 | Mom said to Tom, "Please do not touch the hot stove." | Mom said to Tom, "Please do not touch the hot stove."<br>The girl was excited to play with the old tree and he was so happy. He was so frightened and he started to cry. His mom laughed and said, "I want to see the coin."<br>The boy hurried off to the living room and saw his friend Tommy for the bear. He was very happy. He ran to the doctor and told his mom that he was not allowed to stay away from the dog.<br>Tom and Lily were sorry and asked, "What is this? That way, you can try and get a chest for you."<br>They started to make noises and see a big box. They | (500 tokens, 119.24 it/s) |
 | Once upon a time | Once upon a time there was a baby who lived in a big castle. The bunny was very proud of him and they knew they were going to visit him.<br>As the cow was running and laughing, they said goodbye to the swan. They looked and looked at the man. They learned that it is always difficult to keep it into a patch of light they can be friends and clean up the meadow. | (343 tokens, 151.51 it/s) |
 
+## FP32 and INT8 comparision for tinystoriesgru-0.2M:
+ (two examples each, both at temperature 0.5)
+
+## INT8 (271KB):
+| Prompt | Output |
+| :--- | :--- |
+|The little bird was very sad because he could not fly.|The little bird was very sad because he could not fly. They all felt too big and safe. They were sorry for help. Suddenly, a big butterfly with the bark with their friends. They also played with the bird for a pond with her friends. They are happy and safe. He wanted to go on a pond with his mom's car. They were done and said goodbye to the park. They do not like to come back to her. He was so happy and they could help her and said, "I would do not have fun. They saw a big box of the birds. They liked to play with his toys."
+| Once upon a time | Once upon a time there was a little boy named Timmy. Timmy was so excited and said, "That's a searce was so beautiful. He wanted to help her finished, and that he was tired and something scared. So, they had to go to the picture from the day, Jimmy was so excited. He was happy that he was very happy to explore the grass. They had a lot of fun that he could not make a swimmer.
+
+## FP32 (1MB):
+| Prompt | Output |
+| :--- | :--- |
+|The little bird was very sad because he could not fly.| The little bird was very sad because he could not fly. They saw that he had found a special bird for her friends. They looked around, but they were so scared. When they were all little girl named Lily and they were so happy. They had so much fun and happy and he could see her. She was so excited to see the birds and even safe. They had to do and she was happy. They looked around and said, "Yes, help you a special cookies. She liked to play with his treat. She was happy that she was very proud of himself and had a fun toys in the sky.
+|Once upon a time| Once upon a time there was a little girl and the same scarf toy careful with her mommy to play with his toys. They had a good squirrel and the bird with a special boy. He was so happy that he realized that the ball both had a warm before making a sun with the sea. They all gave her a such a big boy who was going to be so happy. They had a good day she could say sorry and hugged as he held. The bird said that Tom was a long time and said, "I want to play with the big special new pillows and the yummy story."
+
+
 As it can be seen, the official model (transformer based) is still better with long term context, and faster for large context generation. Note here tokens for transofrmer would also be multiplied with the length per character.
 
 Though the GRU is much faster in shorter bursts (short form generation, as self attention is less of an overhead)
 
-The tinystoriesgru model can be directly ran on any machine with python and pytorch by cloning the repository and running ```chat.py```.
+The tinystoriesgru model can be directly ran on any machine with python and pytorch by cloning the repository and running ```chat.py```(for original 2.5M model), ```chat-0.2M.py```(for fp32) and ```chat-0.2M-int8.py```.
 
 # Source:
 
