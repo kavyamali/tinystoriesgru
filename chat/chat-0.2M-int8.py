@@ -181,4 +181,5 @@ while True:
             probs = F.softmax(logits / temperature, dim=-1)
             next_token = torch.multinomial(probs, num_samples=1)
 
+
     print("\n")
