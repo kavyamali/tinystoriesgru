@@ -149,6 +149,8 @@ For examples regarding the generation, you may refer to the INT8 271KB model bel
 
 Although it is to be noted, since the complexity is now approximately linear, the generation, even on python, is incredibly fast.
 
+> Of course, this model.bin can also be quantised down. The total comes to 225KB (even smaller than previous INT8 model) with INT8 model.bin.
+
 ## Final model and performance (vs. Tinystories-1M):
 
 The model was trained on an NVIDIA T4 using Google Colab free, in 2 hours and 10 minutes with a batch size of 64 and 4800 steps in total for the 2.5M model and 1 hour with a bath size of 128 and 10000 steps in total for the 0.2M model.
