@@ -99,21 +99,70 @@ Using standard tools, the measured spectral radius (highest magnitude of eigenva
 | Spectral Radius (ρ)       | 1.8842          | 0.5855
 | Mean Cosine Similarity    | -0.1900          | -0.1904
 
+## Release: tinystoriespuregru, C Inference
+
+So far, the prominent error noticed in the model has been a $\text{spectral radius} > 1$.
+
+After observation, it seems optimiser (AdamW here) is pushing the wieghts and saturating them to limited dimesntions.
+
+The precise mathematical reason remains unknown; but the most probable guess is the current reccurrence has leaning towards amplification of gain for lower loss. Even an SGD sees similar behaviour.
+
+As the optimiser saturates the sector with the highest/most active eigenvalue, the neurons soon reach the range of the gradient. 
+
+From the four activation gates, we look for ```tanh``` and ```sigmoid```.
+
+Both have a range of $(-1, 1)$. 
+
+Essentially, as these neurons saturate and become flat on the gradient, the loss vibrates. 
+
+The tanh and sigmoid gates act as switches for binary like neurons, as the current step is now equal to the history:
+
+$$h(t) \approx h(t-1)$$
+
+This is for $s(t)$ multiplier is approxiamted to 1. 
+
+The tinystoriespuregru model fixes this, by introducing a spectral leash that limits all four gates to a maximum $\text{eigenvalue}(\max) < 0.95$.
+
+Because the $\text{eigenvalue}(\max) < 1$, the function in exponential form will be contracting, which prevents any explosion.
+
+The model is now ready for a C Inference. 
+
+```quantiseforC.py``` uses a scale of 8192 with int16. This allows the weights to a range of $\pm 4$, which standard clipping prevents.
+
+```main.c``` This is the main function that compiles the .bin using ```gcc```. 
+
+The vocab and weight dimensions are all embedded into the C file using python scripts to measure the model, which are not included here. 
+
+> NOTE: If you train the model on custom datasheet, you muet replace the vocab with your own char list.
+
+The C Inference here is based on a 0.21M parameter model, at 831KB FP32 weights. 
+
+Use ```trainwithoutattention.py``` for the same.
+
+Using standard gcc and UPX(Ultimate Packer for eXecutables), we have ```tiny_infer.exe``` at 15KB.
+
+Thanks to the memory gate/priority bias logic, the model performs exactly the same if not worse as the 271KB and even 10M models, both with attention!
+
+> The anchor logic is now dynamically added in the C inference, see ```main.c``` for the implementation.
+
+For examples regarding the generation, you may refer to the INT8 271KB model below (it's the closest match so far). 
+
+Although it is to be noted, since the complexity is now approximately linear, the generation, even on python, is incredibly fast.
+
 ## Final model and performance (vs. Tinystories-1M):
 
 The model was trained on an NVIDIA T4 using Google Colab free, in 2 hours and 10 minutes with a batch size of 64 and 4800 steps in total for the 2.5M model and 1 hour with a bath size of 128 and 10000 steps in total for the 0.2M model.
-
 Since I don't have the hardware to train this model for any longer, I've included the ```train.py``` for anyone to try.
 
 ## Graphs:
 
 1) tinystoriesgru
 
-  ![alt text](https://github.com/kavyamali/tinystoriesgru/blob/main/Graph.png)
+  ![alt text](https://github.com/kavyamali/tinystoriesgru/blob/main/Graphs/Graph.png)
 
 2) tinystoriesgru-0.2M
   
-  ![alt text](https://github.com/kavyamali/tinystoriesgru/blob/main/Graph-0.2M.png)
+  ![alt text](https://github.com/kavyamali/tinystoriesgru/blob/main/Graphs/Graph-0.2M.png)
   
 
 # Comparision with TinyStories-1M
@@ -163,3 +212,5 @@ The tinystoriesgru model can be directly ran on any machine with python and pyto
 # Source:
 
 TinyStories datasheet: https://huggingface.co/datasets/roneneldan/TinyStories
+
+UPX: https://github.com/upx/upx
