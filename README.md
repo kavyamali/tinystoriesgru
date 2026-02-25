@@ -163,6 +163,14 @@ Since I don't have the hardware to train this model for any longer, I've include
 2) tinystoriesgru-0.2M
   
   ![alt text](https://github.com/kavyamali/tinystoriesgru/blob/main/Graphs/Graph-0.2M.png)
+
+3) tinystoriespuregru-0.2M
+
+   ![alt text](https://github.com/kavyamali/tinystoriesgru/blob/main/Graphs/Graphpuregru.png)
+
+Analysis of spectral radius variance (limit=0.95):
+
+  ![alt text](https://github.com/kavyamali/tinystoriesgru/blob/main/Graphs/spectralgraph.png)
   
 
 # Comparision with TinyStories-1M
