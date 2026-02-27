@@ -111,7 +111,7 @@ As the optimiser saturates the sector with the highest/most active eigenvalue, t
 
 From the four activation gates, we look for ```tanh``` and ```sigmoid```.
 
-Both have a range of $(-1, 1)$. 
+Tanh has a range of $(-1, 1)$, and Sigmoid is $(0,-1)$. 
 
 Essentially, as these neurons saturate and become flat on the gradient, the loss vibrates. 
 
@@ -133,7 +133,7 @@ The model is now ready for a C Inference.
 
 The vocab and weight dimensions are all embedded into the C file using python scripts to measure the model, which are not included here. 
 
-> NOTE: If you train the model on custom datasheet, you muet replace the vocab with your own char list.
+> NOTE: If you train the model on custom datasheet, you must replace the vocab with your own char list.
 
 The C Inference here is based on a 0.21M parameter model, at 831KB FP32 weights. 
 
@@ -147,7 +147,7 @@ Thanks to the memory gate/priority bias logic, the model performs exactly the sa
 
 For examples regarding the generation, you may refer to the INT8 271KB model below (it's the closest match so far). 
 
-Although it is to be noted, since the complexity is now approximately linear, the generation, even on python, is incredibly fast.
+Although it is to be noted, since the complexity is now approximately linear(grows only quadratic), the generation, even on python, is incredibly fast.
 
 > Of course, this model.bin can also be quantised down. The total comes to 225KB (even smaller than previous INT8 model) with INT8 model.bin.
 
