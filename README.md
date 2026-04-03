@@ -86,7 +86,7 @@ This has allowed for serious efficiency in terms of raw model size, since a 10.0
 
 The 0.2M model is trained with a batch size of 128 and n_embd=96DIMs.The raw FP32 weights are weighed at 1,051KB or ~1MB. 
 
-The model is further quantised to INT8 precision, which is weighed at 271KB.
+The model is further quantised to INT8 precision, which is weighted at 271KB.
 
 The 0.2M release introduces the Anchor states in the chat file, which is an attempt to force a fake memory for character names in the datasheet over a span of generation.
 
@@ -105,13 +105,13 @@ So far, the prominent error noticed in the model has been a $\text{spectral radi
 
 After observation, it seems optimiser (AdamW here) is pushing the wieghts and saturating them to limited dimesntions.
 
-The precise mathematical reason remains unknown; but the most probable guess is the current reccurrence has leaning towards amplification of gain for lower loss. Even an SGD sees similar behaviour.
+The precise mathematical reason remains unknown; but the most probable guess is the current recurrence has leaning towards amplification of gain for lower loss. Even an SGD sees similar behaviour.
 
 As the optimiser saturates the sector with the highest/most active eigenvalue, the neurons soon reach the range of the gradient. 
 
 From the four activation gates, we look for ```tanh``` and ```sigmoid```.
 
-Tanh has a range of $(-1, 1)$, and Sigmoid is $(0,-1)$. 
+Tanh has a range of $(-1, 1)$, and Sigmoid is $(0,1)$. 
 
 Essentially, as these neurons saturate and become flat on the gradient, the loss vibrates. 
 
