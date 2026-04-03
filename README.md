@@ -147,7 +147,9 @@ Thanks to the memory gate/priority bias logic, the model performs exactly the sa
 
 For examples regarding the generation, you may refer to the INT8 271KB model below (it's the closest match so far). 
 
-Although it is to be noted, since the complexity is now approximately linear(grows only quadratic), the generation, even on python, is incredibly fast.
+Although it is to be noted, since the complexity is now approximately linear(grows only quadratic)[Generation is quadratic due to memory writer. Training complexity not to be confused with generation.), the generation, even on python, is incredibly fast.
+
+
 
 > Of course, this model.bin can also be quantised down. The total comes to 225KB (even smaller than previous INT8 model) with INT8 model.bin.
 
