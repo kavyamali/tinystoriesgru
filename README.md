@@ -68,7 +68,7 @@ This makes the GRU computationally much heavier, since:
 
 * Attention: O(T² · d)
 * GRUCell: O(d²)
-* Total attention cost ≈ Σₜ T² = O(T³)
+* Total attention cost ≈ Σₜ T² = O(T²d)+O(d²)
 
 > This is for full self attention. If more efficient, search query based attention is used, the cost redcuces to O(T²d²). This is demonstrated in tinystoriesgru-0.2M(see ```train.py```).
 
@@ -147,7 +147,7 @@ Thanks to the memory gate/priority bias logic, the model performs exactly the sa
 
 For examples regarding the generation, you may refer to the INT8 271KB model below (it's the closest match so far). 
 
-Although it is to be noted, since the complexity is now approximately linear(grows only quadratic)[Generation is quadratic due to memory writer. Training complexity not to be confused with generation.), the generation, even on python, is incredibly fast.
+Although it is to be noted, since the complexity is now approximately linear(grows only quadratic)[Generation is linear (O(T d²), and so is training without attention. But grows only quadratic means the model uses more compute with dimensional scaling (shouldn't have mentioned this, this is standard GRU)], the generation, even on python, is incredibly fast.
 
 
 
